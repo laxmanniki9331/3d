@@ -14,63 +14,49 @@
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         <!-- Marker for tracking -->
         <a-marker type="pattern" url="pattern-marker.patt">
-            <!-- Add 3D model with interaction capabilities -->
-            <a-entity id="robot" gltf-model="url(RobotExpressive.glb)" scale="0.5 0.5 0.5" position="0 0.5 0" rotation="0 0 0" animation-mixer="clip: walk; loop: repeat;" gesture-detector super-hands draggable stretchable rotateable event-set__1="_event: pinchstarted; scale: 0.5 0.5 0.5"
-                event-set__2="_event: pinchmoved; scale: *=2" event-set__3="_event: pinchended; scale: 1 1 1" event-set__4="_event: click; animation-mixer.clip: wave;" event-set__5="_event: dragend; animation-mixer.clip: walk; move: 1 0 0;">
+            <!-- Add 3D model with basic dragging -->
+            <a-entity gltf-model="url(RobotExpressive.glb)" scale="0.5 0.5 0.5" position="0 0.5 0" rotation="0 0 0" gesture-detector drag-rotate-component event-set__1="_event: dragstart; material.color: #24CAFF" event-set__2="_event: dragend; material.color: #FFFFFF">
             </a-entity>
             <!-- Text Entity to say "Hi" -->
-            <a-text value="Hi!" position="0 1 0" scale="1 1 1" color="#FFFFFF">
-            </a-text>
+            <a-text value="Hi!" position="0 1 0" scale="1 1 1" color="#FFFFFF"></a-text>
         </a-marker>
         <!-- Camera to view the scene -->
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-        // Script to move the model forward
-        AFRAME.registerComponent('move', {
+        AFRAME.registerComponent('drag-rotate-component', {
             schema: {
-                type: 'vec3'
+                speed: {
+                    default: 1
+                }
             },
-            tick: function() {
-                const data = this.data;
-                const el = this.el;
-                el.object3D.position.x += data.x * 0.01;
-                el.object3D.position.y += data.y * 0.01;
-                el.object3D.position.z += data.z * 0.01;
+            init: function() {
+                this.ifMouseDown = false;
+                this.x_cord = 0;
+                this.y_cord = 0;
+                document.addEventListener('mousedown', this.onMouseDown.bind(this));
+                document.addEventListener('mouseup', this.onMouseUp.bind(this));
+                document.addEventListener('mousemove', this.onMouseMove.bind(this));
+            },
+            onMouseDown: function(evt) {
+                this.ifMouseDown = true;
+                this.x_cord = evt.clientX;
+                this.y_cord = evt.clientY;
+            },
+            onMouseUp: function() {
+                this.ifMouseDown = false;
+            },
+            onMouseMove: function(evt) {
+                if (this.ifMouseDown) {
+                    var temp_x = evt.clientX - this.x_cord;
+                    var temp_y = evt.clientY - this.y_cord;
+                    this.el.object3D.rotation.y += temp_x * this.data.speed / 1000;
+                    this.el.object3D.rotation.x += temp_y * this.data.speed / 1000;
+                    this.x_cord = evt.clientX;
+                    this.y_cord = evt.clientY;
+                }
             }
-        });
-
-        // Add event listeners for touchpad controls
-        document.addEventListener('touchstart', function(event) {
-            var robot = document.querySelector('#robot');
-            robot.emit('dragstart');
-        });
-
-        document.addEventListener('touchmove', function(event) {
-            var robot = document.querySelector('#robot');
-            robot.emit('dragmove');
-        });
-
-        document.addEventListener('touchend', function(event) {
-            var robot = document.querySelector('#robot');
-            robot.emit('dragend');
-        });
-
-        // Add event listeners for mouse controls
-        document.addEventListener('mousedown', function(event) {
-            var robot = document.querySelector('#robot');
-            robot.emit('dragstart');
-        });
-
-        document.addEventListener('mousemove', function(event) {
-            var robot = document.querySelector('#robot');
-            robot.emit('dragmove');
-        });
-
-        document.addEventListener('mouseup', function(event) {
-            var robot = document.querySelector('#robot');
-            robot.emit('dragend');
         });
     </script>
 </body>
