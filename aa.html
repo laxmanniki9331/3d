@@ -17,11 +17,9 @@
             <!-- Add 3D model with basic dragging -->
             <a-entity gltf-model="url(RobotExpressive.glb)" scale="0.5 0.5 0.5" position="0 0.5 0" rotation="0 0 0" gesture-detector drag-rotate-component event-set__1="_event: dragstart; material.color: #24CAFF" event-set__2="_event: dragend; material.color: #FFFFFF">
             </a-entity>
-            <!-- Text Entity to say "Hi" -->
-            <a-text value="Hi!" position="0 1 0" scale="1 1 1" color="#FFFFFF"></a-text>
-        </a-marker>
-        <!-- Camera to view the scene -->
-        <a-entity camera></a-entity>
+
+            <!-- Camera to view the scene -->
+            <a-entity camera></a-entity>
     </a-scene>
 
     <script>
